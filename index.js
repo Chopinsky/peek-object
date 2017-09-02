@@ -1,21 +1,28 @@
 'use strict';
 
-module.exports = function(object) {
+module.exports = function(object, noConsoleLog) {
+  var print;
   switch(typeof object) {
     case 'null':
     case 'undefined':
-      console.log(typeof object);
+      print = typeof object;
       break;
     case 'function':
-      console.log(buildFunPrintString(object));
+      print = buildFunPrintString(object);
       break;
     case 'object':
-      console.log(buildObjPrintString(object));
+      print = buildObjPrintString(object);
       break;
     default:
-      console.log(object.toString());
+      print = object.toString();
       break;
   }
+
+  if (!noConsoleLog) {
+    console.log(print);
+  }
+  
+  return print;
 }
 
 function buildFunPrintString(object) {
@@ -23,5 +30,18 @@ function buildFunPrintString(object) {
 }
 
 function buildObjPrintString(object) {
-  return object.toString();
+  var output = "{\n";
+  for (var prop in object) {
+    if (prop !== null && prop !== undefined) {
+      output += "\t" + prop + " (" + typeof object[prop] + ")"
+      if (typeof object[prop] === 'string' 
+        || typeof object[prop] === 'number'
+        || typeof object[prop] === 'boolean') {
+        output += ": " + object[prop] + "\n";
+      } else {
+        output += "\n";
+      }
+    }
+  }
+  return output + "}";
 }
