@@ -38,7 +38,7 @@ function buildObjPrintString(object) {
       if (typeof object[prop] === 'string' 
         || typeof object[prop] === 'number'
         || typeof object[prop] === 'boolean') {
-        output += ": " + object[prop] + "\n";
+        output += ": " + object[prop] || "null" + "\n";
       } else {
         output += "\n";
       }
