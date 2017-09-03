@@ -26,6 +26,7 @@ module.exports = function(object, noConsoleLog) {
 }
 
 function buildFunPrintString(object) {
+  // TODO: beautify output
   return object.toString();
 }
 

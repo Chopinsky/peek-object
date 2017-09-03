@@ -1,6 +1,6 @@
 {
   "name": "peek-object",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "npm module to peek an javascript object and print the metadata to browser console",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,10 @@
   ],
   "author": "Jacob Zuo <jacob.dzwo@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chopinsky/peek-object.git"
+  },
   "devDependencies": {
     "jasmine": "^2.8.0"
   }
