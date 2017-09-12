@@ -34,20 +34,22 @@ module.exports = function(object, options) {
   }
 
   switch(objType) {
-    case 'null':
     case 'undefined':
-      if (!options.excludeNullVals) {
-        print = typeof object;
-      }
+      print = typeof object;
       break;
     case 'function':
       print = buildFunPrintString(object);
       break;
     case 'object':
-      print = buildObjPrintString(object, options.excludeNullVals, exclude);
+      if (object === null) {
+        // typeof null === 'object', yeah, this is Javascript
+        print = 'null';
+      } else {
+        print = buildObjPrintString(object, options.excludeNullVals, exclude);
+      }
       break;
     default:
-      print = object.toString();
+      print = `(${objType}): ${object.toString()}`;
       break;
   }
 
@@ -60,27 +62,39 @@ module.exports = function(object, options) {
 
 function buildFunPrintString(object) {
   // TODO: beautify output
-  return object.toString();
+  return `(function): ${object.toString()}`;
 }
 
-function buildObjPrintString(object, excludeNullVals, excludedPropTypes) {
-  var output = "{\n";
-  var val, valType;
+function buildObjPrintString(obj, excludeNullVals, excludedPropTypes) {
+  var val, valType, emptyVal, output;
+  
+  if (obj instanceof RegExp) {
+    output = `(RegExp): ${obj.toString()}`;
+  } else if (obj instanceof Date) {
+    output = `(Date): ${obj.toString()}`;
+  } else if (obj instanceof Promise) {
+    output = `(Promise): ${obj.toString()}`;
+  } else {
+    // vanilla object
+    var objType = (obj instanceof Array) ? 'array' : 'object';
+    output = `(${objType}): {\n`;
+    Object.getOwnPropertyNames(obj).forEach((prop, idx, array) => {
+      if (prop !== null && prop !== undefined) {
+        val = obj[prop];
+        valType = val === null ? 'null': typeof val;
+        emptyVal = (val === null || val === undefined);
 
-  for (var prop in object) {
-    if (prop !== null && prop !== undefined) {
-      val = object[prop];
-      valType = typeof val;
+        if (excludeNullVals && emptyVal) {
+          return;
+        } else if (!!excludedPropTypes && excludedPropTypes[valType]) {
+          return;
+        }
 
-      if (excludeNullVals && (val === null || val === undefined)) {
-        continue;
-      } else if (!!excludedPropTypes && excludedPropTypes[valType]) {
-        continue
+        output += `  ${prop} (${valType}): ${emptyVal ? val: val.toString()}\n`;
       }
-
-      output += `  ${prop} (${typeof val}): ${val.toString()}\n`;
-    }
+    });
+    output += "}";
   }
 
-  return output + "}";
+  return output;
 }
